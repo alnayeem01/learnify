@@ -1,4 +1,3 @@
-import { log } from "console"
 import mongoose from "mongoose"
 import { MONGO_URI } from "#/utils/variables";
 
@@ -10,5 +9,5 @@ mongoose
         console.log("The db is connected");
     })
     .catch((e)=>{
-        console.log("Error connecting ot hte server: " + e);
+        console.log("Error connecting to the server: " + e);
     });

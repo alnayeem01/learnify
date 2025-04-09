@@ -1,5 +1,6 @@
 // Interface (typescript)
 
+import { compare, hash } from "bcrypt";
 import { Model, model, ObjectId, Schema } from "mongoose";
 
 interface UserDocument {
@@ -14,7 +15,11 @@ interface UserDocument {
     following: ObjectId[];
 };
 
-const userSchema =  new Schema<UserDocument>({ //Creating new schema 
+interface Methods {
+   compareToken(password : string) :Promise<boolean>
+}
+
+const userSchema =  new Schema<UserDocument, {}, Methods>({ //Creating new schema 
       name: {
          type : String,
          required : true,
@@ -55,7 +60,21 @@ const userSchema =  new Schema<UserDocument>({ //Creating new schema
     
 }, {timestamps:true}); // this will timestamp all the updates 
 
+// hash password
+
+userSchema.pre("save", async function(next){
+   if(this.isModified("password")){
+      this.password = await hash(this.password, 10)
+   }
+   next()
+});
+
+userSchema.methods.compareToken = async function (password){
+   const result = await compare(password, this.password);
+   return result
+};
+
 // Ref and model name must match 
 // To add types use Model from mongoose
 
-export default model("User", userSchema) as Model<UserDocument>
+export default model("User", userSchema) as Model<UserDocument, {}, Methods>
