@@ -31,11 +31,7 @@ export const sendVerificationMail = async (token : string, profile : Profile) =>
     const transport = generateEmailTransporter();
 
     const {name, email, userId} = profile
-    // carete and save otp and other attribute
-    await emailVerificationToken.create({
-        owner : userId,
-        token
-    })
+   
 
     const welcomeMessage = `Hi ${name}, Welcome to learnify! There are so much that we do for verified  users. Use the given OTP to verify your email.`;
 

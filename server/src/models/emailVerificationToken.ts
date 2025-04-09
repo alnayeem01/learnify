@@ -1,5 +1,4 @@
 // Interface (typescript)
-
 import { Model, model, ObjectId, Schema } from "mongoose";
 import {compare, hash} from 'bcrypt'
 
