@@ -64,6 +64,49 @@ export const sendVerificationMail = async (token : string, profile : Profile) =>
     
 }
 
+interface Options{
+    email : string;
+    link : string;
+}
+
+export const sendForgetPasswordLink = async (options : Options) =>{
+    //genrate otp
+    const transport = generateEmailTransporter();
+
+    const {email, link} = options
+   
+
+    const message = `Hi, We just received a request that you forgot your password. No problem you can use this link below to set up a brand new password.`
+
+    // mailtrap email 
+    transport.sendMail({
+        to : email,
+        from : VERIFICATION_EMAIL,
+        subject : 'Reset Password Link',
+        html :  generateTemplate({
+            title: 'Forgot Password',
+            message,
+            link,
+            logo: "cid:logo",
+            banner: "cid:welcome",
+            btnTitle: "Reset Password"
+        }),
+        attachments: [
+            {
+                filename: "logo.png",
+                path : path.join(__dirname,'../mail/logo.png' ), // to pass absolute path we used path module#
+                cid : "logo" //cid- Content id
+            },
+            {
+                filename: "welcome.png",
+                path : path.join(__dirname,'../mail/welcome.png' ), // to pass absolute path we used path module#
+                cid : "welcome" //cid- Content id
+            },
+        ]
+    });
+    
+}
+
 
 
 

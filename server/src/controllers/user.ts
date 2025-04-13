@@ -5,9 +5,9 @@ import crypto from 'crypto'
 import { CreateUser, VerifyEmailReq } from "#/@types/user";
 import User from '#/models/user';
 import { generateToken } from "#/utils/helper";
-import { sendVerificationMail } from "#/utils/mail";
+import { sendForgetPasswordLink, sendVerificationMail } from "#/utils/mail";
 import emailVerificationToken from "#/models/emailVerificationToken";
-import {PassworResetToken} from "#/models/passworResetToken";
+import passworResetToken from "#/models/passworResetToken";
 import { PASSWORD_RESET_LINK } from "#/utils/variables";
 
 
@@ -96,10 +96,11 @@ export const sendReVerificationToken: RequestHandler = async (req, res: any) => 
   };
 
 
-
 export const generateForgetPassowordLink: RequestHandler = async (req, res: any) => {
   const { email } = req.body;
   
+
+  //find the user
   const user = await User.findOne({email});
   if(!user){
       return res.status(404).json({error: "Account not found."})
@@ -109,14 +110,47 @@ export const generateForgetPassowordLink: RequestHandler = async (req, res: any)
 
   const token : string = crypto.randomBytes(32).toString();
 
-  PassworResetToken.create({
+
+  // Delete previos token 
+  await passworResetToken.findOneAndDelete({
+    owner: user._id
+  });
+
+
+  passworResetToken.create({
     owner : user._id,
     token
   });
 
-  const resetLink = PASSWORD_RESET_LINK
+  const resetLink = `${PASSWORD_RESET_LINK}?token=${token}&userId=${user._id}`
+
+  // Email the forget password link to user email 
+  sendForgetPasswordLink({
+    email,
+    link: resetLink
+  });
+
+  res.json({message: "Check your registered mail for password reser link."});
 
 };
+
+export const isValidPassword: RequestHandler = async (req, res: any) => {
+  const { token, userId } = req.body;
+
+  const resetToken = await passworResetToken.findOne({
+    owner: userId
+  });
+  
+  if (!resetToken) return res.status(403).json({error : "Invalid token"});
+
+
+  const match = await resetToken.compareToken(token);
+
+  if (!match) return res.status(403).json({error : "Invalid token"});
+
+  res.json({message: "Your token is valid."})
+
+} 
   
   
   
