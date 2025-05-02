@@ -9,14 +9,14 @@ interface UserDocument {
     password : string;
     verified : boolean;
     avatar ?: { url : string; publicId : string };
-    tokens: string
+    tokens: [string]
     favourites: ObjectId[];
     followers: ObjectId[];
     following: ObjectId[];
 };
 
 interface Methods {
-   compareToken(password : string) :Promise<boolean>
+   comparePassword(password : string) :Promise<boolean>
 }
 
 const userSchema =  new Schema<UserDocument, {}, Methods>({ //Creating new schema 
@@ -69,7 +69,7 @@ userSchema.pre("save", async function(next){
    next()
 });
 
-userSchema.methods.compareToken = async function (password){
+userSchema.methods.comparePassword = async function (password){
    const result = await compare(password, this.password);
    return result
 };

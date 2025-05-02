@@ -2,7 +2,7 @@ import nodemailer from 'nodemailer'
 import path from  "path"
 
 
-import { MAILTRAP_PASSWORD, MAILTRAP_USER, VERIFICATION_EMAIL } from "../utils/variables";
+import { MAILTRAP_PASSWORD, MAILTRAP_USER, SIGN_IN_URL, VERIFICATION_EMAIL } from "../utils/variables";
 import emailVerificationToken from "#/models/emailVerificationToken";
 import { generateTemplate } from "#/mail/template";
 
@@ -19,13 +19,13 @@ const generateEmailTransporter  = () => {
     return transport
 };
 
+
+// Send Otp
 interface Profile {
     name: string,
     email: string,
     userId: string,
 };
-
-
 export const sendVerificationMail = async (token : string, profile : Profile) =>{
     //genrate otp
     const transport = generateEmailTransporter();
@@ -64,12 +64,13 @@ export const sendVerificationMail = async (token : string, profile : Profile) =>
     
 }
 
+
+//send password reset link
 interface Options{
     email : string;
     link : string;
 }
-
-export const sendForgetPasswordLink = async (options : Options) =>{
+export const sendForgetPasswordLink = async (options :Options) =>{
     //genrate otp
     const transport = generateEmailTransporter();
 
@@ -90,6 +91,50 @@ export const sendForgetPasswordLink = async (options : Options) =>{
             logo: "cid:logo",
             banner: "cid:welcome",
             btnTitle: "Reset Password"
+        }),
+        attachments: [
+            {
+                filename: "logo.png",
+                path : path.join(__dirname,'../mail/logo.png' ), // to pass absolute path we used path module#
+                cid : "logo" //cid- Content id
+            },
+            {
+                filename: "welcome.png",
+                path : path.join(__dirname,'../mail/welcome.png' ), // to pass absolute path we used path module#
+                cid : "welcome" //cid- Content id
+            },
+        ]
+    });
+    
+}
+
+
+// send password update email
+interface Item{
+    name : string,
+    email : string
+};
+export const  sendPasswordResetSuccesEmail = async (item :Item) =>{
+    //genrate otp
+    const transport = generateEmailTransporter();
+
+    const {name, email} = item;
+   
+
+    const message = `${name}, we just updated your password. You can now sign in with new password.`
+
+    // mailtrap email 
+    transport.sendMail({
+        to : email,
+        from : VERIFICATION_EMAIL,
+        subject : 'Password Changed',
+        html :  generateTemplate({
+            title: 'Password changed successfully',
+            message,
+            link: SIGN_IN_URL,
+            logo: "cid:logo",
+            banner: "cid:welcome",
+            btnTitle: "Log in"
         }),
         attachments: [
             {
