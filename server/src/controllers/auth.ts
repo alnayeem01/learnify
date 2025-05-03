@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 
 import { CreateUser, VerifyEmailReq } from "#/@types/user";
 import User from "#/models/user";
-import { generateToken } from "#/utils/helper";
+import { formatProfile, generateToken } from "#/utils/helper";
 import {
   sendForgetPasswordLink,
   sendPasswordResetSuccesEmail,
@@ -14,6 +14,9 @@ import {
 import emailVerificationToken from "#/models/emailVerificationToken";
 import passwordResetToken from "#/models/passworResetToken";
 import { JWT_SECRET, PASSWORD_RESET_LINK } from "#/utils/variables";
+import { RequestWithFiles } from "#/middleware/fielParser";
+import cloudinary from "#/cloud";
+import formidable from "formidable";
 
 export const create: RequestHandler = async (req: CreateUser, res) => {
   const { name, email, password } = req.body;
@@ -175,7 +178,7 @@ export const updatePassword: RequestHandler = async (req, res: any) => {
 export const signIn: RequestHandler = async (req, res: any) => {
   const { email, password } = req.body;
 
-  const user = await User.findOne({email});
+  const user = await User.findOne({ email });
 
   if (!user) return res.status(403).json({ error: "Error/Password mismatch" });
 
@@ -200,6 +203,85 @@ export const signIn: RequestHandler = async (req, res: any) => {
       followers: user.followers.length,
       following: user.following.length,
     },
-    token
+    token,
   });
 };
+
+
+//upload new avatar
+export const updateProfile: RequestHandler = async (
+  req: RequestWithFiles,
+  res:any
+) => {
+  const { name } = req.body;
+  const avatar = req.files?.avatar as formidable.File;
+
+   // Find the user by their ID
+   const user = await User.findById(req.user.id);
+  //  if (!user) {
+  //    return res.status(404).json({ error: "User not found!" });
+  //  }
+  if(!user) throw new Error ("SOmethign went wrong, user not found!");
+
+  if (typeof name !== "string")
+    return res.status(422).json({ error: "Invalid name!" });
+
+  if (name.trim().length < 3)
+    return res.status(422).json({ error: "Invalid name!" });
+
+  user.name = name;
+  try{
+    if (avatar) {
+      // if there is already an avatar file, we want to remove that
+      try{
+        if(user.avatar?.publicId){
+          await cloudinary.uploader.destroy(user.avatar?.publicId)
+        }
+      }catch(e){
+        res.json({error: e})
+      }
+  
+      // upload new avatar file
+      const { secure_url, public_id } = await cloudinary.uploader.upload(
+        avatar.filepath,
+        {
+          width: 300,
+          height: 300,
+          crop: "thumb",
+          gravity: "face",
+        }
+      );
+  
+      user.avatar = { url: secure_url, publicId: public_id };
+    }
+    
+  }catch(e){
+    res.json({error: e})
+  }
+  await user.save();
+
+  res.json({ profile: formatProfile(user) });
+};
+
+//if user is authenticated send user profile
+export const sendProfile : RequestHandler = async(req, res)=>{
+  res.json({profile: req.user})
+}
+
+//logout 
+export const logout : RequestHandler = async(req, res)=>{
+  //logout and logout form all
+  const {fromAll} =  req.query;
+
+  const token = req.token;
+  const user = await User.findById(req.user.id);
+  if(!user) throw new Error ("Somethign went wrong, user not found!");
+
+  //logout form all
+  if(fromAll === "yes") user.tokens =[];
+  else user.tokens = user.tokens.filter((t)=> t !== token);
+
+  await user.save();
+  res.status(200).json({success : "true"});
+}
+

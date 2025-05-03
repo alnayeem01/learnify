@@ -1,13 +1,11 @@
 import  {Response, Router} from 'express';
-import formidable from 'formidable';
-import path from 'path';
-import fs from 'fs';
 
 
 import { validate } from '#/middleware/validator'
 import { CreateUserSchema, EmailVerificationBody, SignInValidationSchema, TokenAndIdValidation, UpdatePasswordSchema } from '#/utils/validationSchema';
-import { create, generateForgetPassowordLink, grantValid, sendReVerificationToken, signIn, updatePassword, verifyEmail } from '#/controllers/user';
+import { create, generateForgetPassowordLink, grantValid, logout, sendProfile, sendReVerificationToken, signIn, updatePassword, updateProfile, verifyEmail } from '#/controllers/auth';
 import { isValidPasswordResetToken, mustAuth } from '#/middleware/auth';
+import fileParser, { RequestWithFiles } from '#/middleware/fielParser';
 
 
 
@@ -44,11 +42,8 @@ router.post(
     signIn
  );
 
-router.get("/is-auth",mustAuth,(req,res)=>{
-    res.json({
-        profile: req.user,
-    })
-});
+router.get("/is-auth",mustAuth,sendProfile);
+
 
 router.post("/public",(req,res)=>{
     res.json({message :"You are in public route"})
@@ -58,36 +53,9 @@ router.post("/private",mustAuth,(req,res)=>{
     res.json({message: "You are in private route"})
 });
 
-router.post("/update-profile",async (req,res: any)=>{
-    
-    //content type must be multipart/form-data
-    if (!req.headers["content-type"]?.startsWith("multipart/form-data"))
-        return res.status(420).json({ error: "Only accepts form data" });
-    
-    //Uplaod path
-    const dir = path.join(__dirname,"../public/profiles");
+router.post("/update-profile",mustAuth, fileParser, updateProfile);
 
-    //If uplaod folder isnt there create a new one usign fs module 
-    try{
-        await fs.readdirSync(dir)
-    }catch(e){
-        await fs.mkdirSync(dir)
-    }
-    
-    //handle file upload
-    const form = formidable({
-        uploadDir : dir,
-        filename(name, ext, part, form) {
-            return Date.now()+ "_" + part.originalFilename
-        },
-    });
-    form.parse(req, (err,fields,files) =>{
-        // console.log("Fields: ", fields);
-        // console.log("Files: ", files);
-
-        res.json({uploaded: true});
-    })
-});
+router.post("/log-out", mustAuth, logout);
 
 
 export default router;

@@ -3,13 +3,14 @@
 import { compare, hash } from "bcrypt";
 import { Model, model, ObjectId, Schema } from "mongoose";
 
-interface UserDocument {
+export interface UserDocument {
+    _id : ObjectId;
     name : string;
     email : string;
     password : string;
     verified : boolean;
     avatar ?: { url : string; publicId : string };
-    tokens: [string]
+    tokens: string[]
     favourites: ObjectId[];
     followers: ObjectId[];
     following: ObjectId[];

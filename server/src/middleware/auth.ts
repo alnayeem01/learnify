@@ -48,5 +48,12 @@ export const mustAuth :RequestHandler = async (req,res:any, next)=>{
     followers: user.followers.length,
     following: user.following.length,
   }
+  req.token = token
   next()
 };
+
+export const isVerified :RequestHandler =(req,res:any, next)=>{
+  if (!req.user.verified) return res.status(403).json({error: "Please verify your email"});
+
+  next();
+}
