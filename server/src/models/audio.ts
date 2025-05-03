@@ -2,10 +2,11 @@ import { categories, categoriesTypes } from "#/utils/audioCategory";
 import { Model, model, ObjectId, Schema } from "mongoose";
 
 
-export interface AudioDocument {
+export interface AudioDocument< T =  ObjectId> {
+    _id: ObjectId,
     title : string;
     about : string;
-    owner : ObjectId;
+    owner : T;
     file : {
         url : string;
         pulicId : string;
@@ -29,7 +30,7 @@ const AudioSchema = new Schema<AudioDocument>({
     },
     owner: {
         type: Schema.Types.ObjectId,
-        ref: "user"
+        ref: "User"
     },
     file :{
         type: Object,

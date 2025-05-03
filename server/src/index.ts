@@ -3,6 +3,9 @@ import "dotenv/config";
 import "./db";
 import authRouter from './routers/auth';
 import audioRouter from './routers/audio'
+import favouriteRouter from './routers/favourite'
+import playlistRouter from './routers/playlist'
+import profileRouter from '#/routers/profile'
 
 
 const app = express();
@@ -15,11 +18,21 @@ app.use(express.static('src/public/'))
 
 const port = process.env.PORT || 5000;
 
-//http//:localhost:500/auth/create/ 
+//http//:localhost:500/auth/
 app.use("/auth", authRouter);
 
-//http//:localhost:500/auth/create/ 
+//http//:localhost:500/audio//
 app.use("/audio", audioRouter);
+
+//http//:localhost:500/favourites//
+app.use("/favourite", favouriteRouter);
+
+//http//:localhost:500/playlist//
+app.use("/playlist", playlistRouter);
+
+//http//:localhost:500/profile/
+app.use("/profile", profileRouter);
+
 
 
 app.listen(port, () =>{
