@@ -6,6 +6,7 @@ import audioRouter from './routers/audio'
 import favouriteRouter from './routers/favourite'
 import playlistRouter from './routers/playlist'
 import profileRouter from '#/routers/profile'
+import historyRouter from '#/routers/history'
 
 
 const app = express();
@@ -32,6 +33,9 @@ app.use("/playlist", playlistRouter);
 
 //http//:localhost:500/profile/
 app.use("/profile", profileRouter);
+
+//http//:localhost:500/profile/
+app.use("/history", historyRouter);
 
 
 
