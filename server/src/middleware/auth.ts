@@ -57,3 +57,30 @@ export const isVerified :RequestHandler =(req,res:any, next)=>{
 
   next();
 }
+
+
+export const isAuth :RequestHandler = async (req,res:any, next)=>{
+  const {authorization} = req.headers
+  const token = authorization?.split("Bearer ")[1];
+
+  if(token){
+     //verify method from jwt 
+  const verifiedToken = verify(token, JWT_SECRET) as JwtPayload;
+  const id = verifiedToken.userId 
+
+  const user = await User.findOne({_id: id, tokens: token});
+  if(!user) return res.status(400).json({error:"Unauthorised access."})
+
+  req.user={
+    id: user._id,
+    name: user.name,
+    email: user.email,
+    verified: user.verified,
+    avatar: user.avatar?.url,
+    followers: user.followers.length,
+    following: user.following.length,
+  }
+  req.token = token
+  }
+  next()
+};

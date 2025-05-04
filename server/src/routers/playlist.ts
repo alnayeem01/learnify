@@ -1,5 +1,5 @@
-import { createPlaylist, getAudios, getPlaylistByProfile, removePlaylist, updatePlaylist } from '#/controllers/playlist';
-import { mustAuth } from '#/middleware/auth';
+import { createPlaylist, getAudios, getPlaylistByProfile,  removePlaylist, updatePlaylist } from '#/controllers/playlist';
+import { isAuth, mustAuth } from '#/middleware/auth';
 import { validate } from '#/middleware/validator';
 import { OldPlaylistValidationSchema, PlaylistValidationSchema } from '#/utils/validationSchema';
 import Router from 'express'
@@ -21,6 +21,8 @@ router.get("/by-profile", mustAuth, getPlaylistByProfile);
 
 //get playlist for user
 router.get("/:playlistId", mustAuth, getAudios)
+
+
 
 
 export default router
