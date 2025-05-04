@@ -1,7 +1,7 @@
 import { Model, model, ObjectId, Schema } from "mongoose";
 
 
-type HistoryType ={ audio: ObjectId, progress: number, date: Date}
+export type HistoryType ={ audio: ObjectId, progress: number, date: Date}
 
 interface HistoryDocument {
     owner : ObjectId,
@@ -16,7 +16,7 @@ const historySchema = new Schema<HistoryDocument>({
         required: true
     },
     last:{
-        aduio : {
+        audio : {
             type: Schema.Types.ObjectId,
             ref: "Audio",
         },
@@ -27,7 +27,7 @@ const historySchema = new Schema<HistoryDocument>({
         }
     },
     all: [{
-        aduio : {
+        audio : {
             type: Schema.Types.ObjectId,
             ref: "Audio",
         },

@@ -107,3 +107,16 @@ export const OldPlaylistValidationSchema = yup.object().shape({
     // .required("Category is missing!") 
     // (not needed as already got validated in playlist cration time )
 });
+export const updateHistoyValidationSchema = yup.object().shape({
+   audio: yup.string().transform(function (value){
+    return this.isType(value) && isValidObjectId(value) ? value :""
+   }).required("Invalid audio id!"),
+   progress: yup.number().required("History progess is missing!"),
+   date: yup.string().transform(function (value){
+    const date = new  Date(value)
+    if(date instanceof(Date)) return value;
+    return ""
+   }).required("Invalid date!")
+
+
+});
