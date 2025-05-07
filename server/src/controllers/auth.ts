@@ -18,8 +18,13 @@ import { RequestWithFiles } from "#/middleware/fielParser";
 import cloudinary from "#/cloud";
 import formidable from "formidable";
 
-export const create: RequestHandler = async (req: CreateUser, res) => {
+export const create: RequestHandler = async (req: CreateUser, res:any) => {
   const { name, email, password } = req.body;
+
+  //check if user exists
+  const isUser = await User.findOne({email})
+  if(isUser) return res.status(403).json({error: "User already exists!"});
+    
   // create and save user
   const newUser = await User.create({ name, email, password });
 
