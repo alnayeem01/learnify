@@ -4,6 +4,8 @@ import Audio, { AudioDocument } from "../models/audio";
 import Favourite from "../models/favourite";
 import User from "#/models/user"; // adjust path
 import { PopulatedFavList } from "#/@types/audio";
+import { paginationQuery } from "#/@types/misc";
+import { File } from "node:buffer";
 
 export const toggleFavourite: RequestHandler = async (req, res: any) => {
   const audioId = req.query.audioId as string;
@@ -32,7 +34,7 @@ export const toggleFavourite: RequestHandler = async (req, res: any) => {
     const favourite = await Favourite.findOne({ owner: req.user.id });
     if (favourite) {
       //trying to add a new audio in old fav list
-      Favourite.updateOne(
+      await Favourite.updateOne(
         { owner: req.user.id },
         {
           // $addToSet is a built in operator : The $addToSet operator adds a value to an array unless the value is already present, in which case $addToSet does nothing to that array.
@@ -65,26 +67,55 @@ export const toggleFavourite: RequestHandler = async (req, res: any) => {
 
 export const getFavs: RequestHandler = async (req, res: any) => {
   const userId = req.user.id;
-
-  const favourite = await Favourite.findOne({ owner: userId })
-  .populate<{items:PopulatedFavList[]}>({
-    path: "items",
-    populate: {
-      path: "owner",
+  const {pageNo="0", limit ="20"} = req.query as paginationQuery;
+  
+  const favourites = await Favourite.aggregate([
+    {$match: {owner: userId}},
+    //usign project query we will slice the favourites according to pagiantion 
+    {
+      $project:{
+        audioIds:{
+          $slice:["$items", parseInt(pageNo) * parseInt(limit), parseInt(limit)]
+        }
+      }
     },
-  });
-  if (!favourite) return res.json({ error: "List doesn't exist" });
-  const audios = favourite.items.map((item) => {
-    return {
-        id: item._id,
-        title :item.title,
-        category: item.category,
-        file: item.file.url,
-        poster: item.poster?.url,
-        owner: {owner: item.owner.name, id: item.owner._id}
+    {
+      $unwind: "$audioIds"
+    },
+    {
+      $lookup :{
+        from: "audios",
+        localField: "audioIds",
+        foreignField: "_id",
+        as:"audioInfo"
+      }
+    },
+    {$unwind: "$audioInfo"},
+    {
+      $lookup :{
+        from: "users",
+        localField: "audioInfo.owner",
+        foreignField: "_id",
+        as:"ownerInfo"
+      }
+    },
+    {$unwind: "$ownerInfo"},
+    {
+      $project: {
+        _id: 0,
+        id: "$audioInfo._id",
+        title: "$audioInfo.title",
+        about : "$audioInfo.about",
+        file : "$audioInfo.file.url",
+        category: "$audioInfo.category",
+        poster : "$audioInfo.poster.url",
+        owner: {name: "$ownerInfo.name", id: "$ownerInfo._id"}
+      }
     }
-  });
-  res.json({audios: audios });
+  ]);
+
+  res.json({audios: favourites})
+
 };
 
 export const getIsFav: RequestHandler = async (req, res: any) => {
