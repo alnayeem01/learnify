@@ -411,7 +411,7 @@ export const getFollowingsProfile: RequestHandler = async(req, res: Response)=>{
 };
 
 //get followers for the authenticated user
-export const getFollowersProfilePublic: RequestHandler = async (req, res) => {
+export const getFollowersProfilePublic: RequestHandler = async (req, res:any) => {
   const { limit = "20", pageNo = "0" } = req.query as paginationQuery;
   const { profileId } = req.params;
 
@@ -463,3 +463,46 @@ export const getFollowersProfilePublic: RequestHandler = async (req, res) => {
   res.json({ followers: result.followers });
 };
 
+// get audios for this playlist 
+export const getPlaylistAudios: RequestHandler = async (req,res:any)=>{
+  const { limit = "20", pageNo = "0" } = req.query as paginationQuery;
+
+  const {playlistId} = req.params;
+  if(!playlistId) return res.json({error:"Playlist not found!"})
+
+  const result = await Playlist.aggregate([
+    { $match: { _id: new Types.ObjectId(playlistId) } },
+    {
+      $project:{
+        items:{
+          $slice: ["$items", parseInt(pageNo) * parseInt(limit), parseInt(limit)]
+        }
+      }
+    },
+    {
+      $unwind: "$items"
+    },
+    {$lookup:{
+      from: "audios",
+      localField: "items",
+      foreignField: "_id",
+      as: "audioInfo"
+    }},
+    {
+      $unwind: "$audioInfo"
+    },
+    {
+      $project:{
+        _id: 0,
+        id: playlistId,
+        audioId: "$audioInfo._id",
+        audioTitle: "$audioInfo.title",
+        audioAbout: "$audioInfo.about",
+        audioFile: "$audioInfo.file.url",
+        audioPoster: "$audioInfo.poster.url",
+        audioCategory:"$audioInfo.category",
+      }
+    }
+  ])
+  res.json({result})
+}
