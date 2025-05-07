@@ -411,55 +411,55 @@ export const getFollowingsProfile: RequestHandler = async(req, res: Response)=>{
 };
 
 //get followers for the authenticated user
-export const getFollowersProfilePublic: RequestHandler = async(req, res: any)=>{
-  const {limit ="20", pageNo="0"} = req.query as paginationQuery
-  const {profileId} = req.params;
-  if(!isValidObjectId(profileId)){
-    return res.status(422).json({eror: "Invalid Profile"});
+export const getFollowersProfilePublic: RequestHandler = async (req, res) => {
+  const { limit = "20", pageNo = "0" } = req.query as paginationQuery;
+  const { profileId } = req.params;
+
+  if (!isValidObjectId(profileId)) {
+    return res.status(422).json({ error: "Invalid profile id!" });
   }
 
   const [result] = await User.aggregate([
-    {
-      $match: {_id: new Types.ObjectId(profileId)}
-    },
+    { $match: { _id: new Types.ObjectId(profileId) } },
     {
       $project: {
-        followings:{
-          $slice:  ["$followers", parseInt(pageNo) * parseInt(limit), parseInt(limit)]
-        }
-      }
+        followers: {
+          $slice: [
+            "$followers",
+            parseInt(pageNo) * parseInt(limit),
+            parseInt(limit),
+          ],
+        },
+      },
     },
+    { $unwind: "$followers" },
     {
-      $unwind: {path: "$followings"}
-    },
-    {
-      $lookup:{
-        from : "users",
-        localField: "followings",
+      $lookup: {
+        from: "users",
+        localField: "followers",
         foreignField: "_id",
-        as: "UserInfo"
-      }
+        as: "userInfo",
+      },
     },
+    { $unwind: "$userInfo" },
     {
-      $unwind: "$userInfo"
-    },
-    {
-      $group:{
+      $group: {
         _id: null,
         followers: {
-          $push:{
+          $push: {
             id: "$userInfo._id",
             name: "$userInfo.name",
-            avatar: "$userInfo.avatar.url"
-          }
-        }
-      }
-    }
+            avatar: "$userInfo.avatar.url",
+          },
+        },
+      },
+    },
   ]);
-  if(!result){
-    return res.json({followers:[]})
+
+  if (!result) {
+    return res.json({ followers: [] });
   }
 
-  res.json({followers: result})
+  res.json({ followers: result.followers });
 };
 
