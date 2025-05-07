@@ -26,6 +26,7 @@ export const createAudio: RequestHandler = async (
   if (!audioFile)
     return res.status(422).json({ error: "Audio file is missing" });
 
+
   //Upload the audio
   const audioRes = await cloudinary.uploader.upload(audioFile.filepath, {
     resource_type: "video",
@@ -67,6 +68,7 @@ export const createAudio: RequestHandler = async (
     },
   });
 };
+
 
 export const updateAudio: RequestHandler = async (
   req: CreateAudioRequest,

@@ -20,7 +20,6 @@ import formidable from "formidable";
 
 export const create: RequestHandler = async (req: CreateUser, res) => {
   const { name, email, password } = req.body;
-
   // create and save user
   const newUser = await User.create({ name, email, password });
 
