@@ -97,6 +97,7 @@ export const getUploads: RequestHandler = async (req, res: any) => {
       id: item._id,
       title: item.title,
       about: item.about,
+      category: item.category,
       file: item.file.url,
       poster: item.poster?.url,
       data: item.createdAt,
@@ -625,4 +626,16 @@ export const getPrivatePlaylistAudios: RequestHandler = async (req,res:any)=>{
 
   res.json({list: playlistResult})
 }
+
+// get audios for this playlist 
+export const getIsFollowing: RequestHandler = async (req,res:any)=>{
+  const { profileId } = req.params;
+
+  if(!isValidObjectId(profileId)) return res.status(422).json({error:"Invalid profile, not found!"})
+  
+  const user = await User.findOne({_id: profileId, followers:req.user.id });
+
+  res.json({status: user? true : false})
+}
+
 
