@@ -476,7 +476,8 @@ export const getPlaylistAudios: RequestHandler = async (req,res:any)=>{
       $project:{
         items:{
           $slice: ["$items", parseInt(pageNo) * parseInt(limit), parseInt(limit)]
-        }
+        },
+        title: "$title"
       }
     },
     {
@@ -486,21 +487,45 @@ export const getPlaylistAudios: RequestHandler = async (req,res:any)=>{
       from: "audios",
       localField: "items",
       foreignField: "_id",
-      as: "audioInfo"
+      as: "audios"
     }},
     {
-      $unwind: "$audioInfo"
+      $unwind: "$audios"
+    },
+    {$lookup:{
+      from: "users",
+      localField: "audios.owner",
+      foreignField: "_id",
+      as: "userInfo"
+    }},
+    {
+      $unwind: "$userInfo"
+    },
+    {
+      $group:{
+        _id: {
+          id: "$_id",
+          title: "$title",
+        },
+        audios: {
+          $push:{
+            id:"$audios._id",
+            title: "$audios.title",
+            about: "$audios.about",
+            category: "$audios.category",
+            file: "$audios.file.url",
+            poster: "$audios.poster.url",
+            owner: {name: "$userInfo.name", id: "$userInfo._id"}
+          }
+        }
+      }
     },
     {
       $project:{
         _id: 0,
-        id: playlistId,
-        audioId: "$audioInfo._id",
-        audioTitle: "$audioInfo.title",
-        audioAbout: "$audioInfo.about",
-        audioFile: "$audioInfo.file.url",
-        audioPoster: "$audioInfo.poster.url",
-        audioCategory:"$audioInfo.category",
+        id: "$_id.id",
+        title: "$_id.title",
+        audios: "$$ROOT.audios",
       }
     }
   ])
