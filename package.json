@@ -6,7 +6,7 @@
     "dev": "tsnd --respawn -r tsconfig-paths/register --pretty --transpile-only ./src/index.ts",
     "build": "tsc  && tsc-alias && npm run copy-images",
     "copy-images": "cp -R  src/mail/images dist/mail",
-    "start": "node ./dist"
+    "start": "node ./dist/index.js"
   },
   "keywords": [],
   "author": "Al Shahriar Nayeem",
