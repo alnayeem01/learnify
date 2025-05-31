@@ -1,6 +1,6 @@
 import { CreatePlaylistRequest, PopulatedFavList, updatePlaylistRequest } from "#/@types/audio";
 
-import e, { RequestHandler } from "express";
+import  { RequestHandler } from "express";
 import Audio from "#/models/audio";
 import Playlist from "#/models/playlist";
 import { isValidObjectId } from "mongoose";

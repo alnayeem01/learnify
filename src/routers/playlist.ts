@@ -19,7 +19,7 @@ router.delete("/", mustAuth, removePlaylist)
 router.get("/by-profile", mustAuth, getPlaylistByProfile);
 
 
-//get playlist for user
+//get playlist audio for user
 router.get("/:playlistId", mustAuth, getAudios)
 
 

@@ -14,7 +14,6 @@ import { errorHandler } from "./middleware/error";
 const app = express();
 
 // middlewares
-
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(express.static('src/public/'))

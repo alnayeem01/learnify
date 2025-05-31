@@ -55,6 +55,7 @@ router.post("/private",mustAuth,(req,res)=>{
 
 router.post("/update-profile",mustAuth, fileParser, updateProfile);
 
+// /auth/log-out/?fromAll=false or null
 router.post("/log-out", mustAuth, logout);
 
 
