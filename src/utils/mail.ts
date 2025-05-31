@@ -51,12 +51,12 @@ export const sendVerificationMail = async (token : string, profile : Profile) =>
         attachments: [
             {
                 filename: "logo.png",
-                path : path.join(__dirname,'../mail/logo.png' ), // to pass absolute path we used path module#
+                path : path.join(__dirname,'../mail/images/logo.png' ), // to pass absolute path we used path module#
                 cid : "logo" //cid- Content id
             },
             {
                 filename: "welcome.png",
-                path : path.join(__dirname,'../mail/welcome.png' ), // to pass absolute path we used path module#
+                path : path.join(__dirname,'../mail/images/welcome.png' ), // to pass absolute path we used path module#
                 cid : "welcome" //cid- Content id
             },
         ]
