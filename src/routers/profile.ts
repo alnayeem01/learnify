@@ -37,7 +37,7 @@ router.get("/followers/:profileId", mustAuth, getFollowersProfilePublic)
 //get audios from a playlist
 router.get("/playlist-audios/:playlistId", getPlaylistAudios)
 
-//get audios from a playlist
+//get audios from a private playlist
 router.get("/private-playlist-audios/:playlistId", mustAuth,getPrivatePlaylistAudios)  
 
 //get audios from a playlist

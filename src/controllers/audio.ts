@@ -126,6 +126,7 @@ export const getLatestUploads: RequestHandler = async (req, res: any) => {
   const audios = list.map((item) => {
     return {
       id: item._id,
+      file: item.file.url,
       title: item.title,
       about: item.about,
       category: item.category,

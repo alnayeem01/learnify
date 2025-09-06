@@ -123,7 +123,6 @@ export const getIsFav: RequestHandler = async (req, res: any) => {
     if (!isValidObjectId(audioId)) return res.status(422).json({error: "Invalid audio Id!"})
   
     const favourite = await Favourite.findOne({ owner: req.user.id, items : audioId });
-    if (!favourite) return res.json({ error: "List doesn't exist" });
     
-    res.json({result: favourite? true : true});
+    res.json({result: favourite? true : false});
   };

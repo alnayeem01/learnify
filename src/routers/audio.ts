@@ -12,7 +12,7 @@ const router = Router();
 router.post("/create", mustAuth, isVerified, fileParser, validate(AudioValidationSchema), createAudio);
 
 //update audio
-router.post("/:audioId", mustAuth, isVerified, fileParser, validate(AudioValidationSchema), updateAudio);
+router.patch("/:audioId", mustAuth, isVerified, fileParser, validate(AudioValidationSchema), updateAudio);
 
 
 //latest audio 
