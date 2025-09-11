@@ -13,7 +13,7 @@
         "baseUrl": ".",
         "paths": {
             "#/*": ["./src/*"]
-        }
+        },
+        "types": ["node", "express"]
     },
-    "types": ["node"]
 }

@@ -4,19 +4,14 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsnd --respawn -r tsconfig-paths/register --pretty --transpile-only ./src/index.ts",
-    "build": "tsc  && tsc-alias && npm run copy-images",
-    "copy-images": "cpx  src/mail/images dist/mail",
+    "build": "tsc && tsc-alias && npm run copy-images",
+    "copy-images": "cp -r src/mail/images dist/mail",
     "start": "node ./dist/index.js"
   },
-  "keywords": [],
   "author": "Al Shahriar Nayeem",
   "license": "ISC",
-  "description": "Server for learinify",
+  "description": "Server for learnify",
   "dependencies": {
-    "@types/bcrypt": "^5.0.2",
-    "@types/formidable": "^3.4.5",
-    "@types/jsonwebtoken": "^9.0.9",
-    "@types/node-cron": "^3.0.11",
     "bcrypt": "^5.1.1",
     "cloudinary": "^2.6.0",
     "dotenv": "^16.4.7",
@@ -32,11 +27,16 @@
     "yup": "^1.6.1"
   },
   "devDependencies": {
-    "@types/dotenv": "^6.1.1",
-    "@types/express": "^5.0.1",
-    "@types/mongoose": "^5.11.96",
+    "@types/bcrypt": "^5.0.2",
+    "@types/express": "^4.17.21",
+    "@types/formidable": "^3.4.5",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/moment": "^2.13.0",
+    "@types/mongoose": "^5.11.97",
     "@types/node": "^22.18.1",
+    "@types/node-cron": "^3.0.11",
     "@types/nodemailer": "^6.4.17",
+    "@types/yup": "^0.29.13",
     "tsc-alias": "^1.8.11",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.8.2"
