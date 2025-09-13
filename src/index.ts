@@ -20,6 +20,10 @@ app.use(express.static('src/public/'))
 
 const port = process.env.PORT || 5000;
 
+app.use("/",(req, res)=>{
+    res.json("HI Server :)");
+})
+
 //http//:localhost:500/auth/
 app.use("/auth", authRouter);
 
