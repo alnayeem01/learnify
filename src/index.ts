@@ -24,9 +24,6 @@ app.get("/", (req, res) => {
   res.json("HI Server :)");
 });
 
-app.get("*", (req, res) => {
-  res.json("not found!");
-});
 
 //http//:localhost:500/auth/
 app.use("/auth", authRouter);
@@ -46,8 +43,12 @@ app.use("/profile", profileRouter);
 //http//:localhost:500/profile/
 app.use("/history", historyRouter);
 
+app.get("*", (req, res) => {
+  res.status(404).json({error: "not found!"});
+});
+
 app.use(errorHandler);
 
 app.listen(port, () => {
-  console.log("The is server running on: http://localhost:" + port);
+    console.log("The is server running on: http://localhost:" + port);
 });
