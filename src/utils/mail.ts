@@ -7,7 +7,6 @@ import {
   MAILTRAP_USER,
   SIGN_IN_URL,
   VERIFICATION_EMAIL,
-  MAIILTRAP_API_KEY,
   MAILTRAP_API_KEY,
 } from "../utils/variables";
 import fs from "fs";
