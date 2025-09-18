@@ -138,7 +138,7 @@ export const generateTemplate = (options: Options) => {
                           <tbody>
                             <tr>
                               <td class="column column-1" style="text-align:center;" width="100%">
-                                <p style="font-family:Arial, Helvetica Neue, Helvetica, sans-serif;font-size:14px;color:#101010;">© Your Company</p>
+                                <p style="font-family:Arial, Helvetica Neue, Helvetica, sans-serif;font-size:14px;color:#101010;">© Learnify</p>
                               </td>
                             </tr>
                           </tbody>
